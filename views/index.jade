@@ -7,10 +7,10 @@ block content
     a(class='button' href='http://www.baidu.com') 百度一下，你就知道
   form(action='/postTest' method='POST').dclass#did
     div
-      label(style='padding-right:5px') 姓名
+      label 姓名
       input(type='text' name='text1' placeholder='请输入姓名')
     div
-      label(style='padding-right:5px') 密码
+      label 密码
       input(type='text' name='text2' placeholder='请输入密码')
     div
       input(type='submit' value='提交')
@@ -21,16 +21,22 @@ block content
     p
     input(type='submit' value='上传文件')
   p
-  table(width="400", border="1", cellspacing="0", cellpadding="0")
+  table(width="400", border='1' cellspacing="0", cellpadding="0")
     tbody
       tr
         th 登录名
         th 用户名
         th 性别
         th 密码
+        th 操作
     tbody
+    each user in userList
       tr
-        th xxx
-        th www
-        th eee
-        th ccc
+        th #{user.loginName}
+        th #{user.userName}
+        th #{user.sex}
+        th #{user.password}
+        th
+          a(href='/addUser') 添加
+          a(href='/updateUser?id=#{user.id}')  编辑
+          a(href='/deleteUser?id=#{user.id}')  删除

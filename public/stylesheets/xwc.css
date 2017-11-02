@@ -4,3 +4,12 @@ div{
 a {
     color: #f80;
 }
+
+table {
+    border: 1px solid #ccc;
+    color: #00B7FF;
+}
+
+label {
+    padding-right:5px
+}
