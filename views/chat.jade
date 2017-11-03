@@ -1,0 +1,26 @@
+//Created by xuwc on 2017/11/3.
+doctype html
+html(lang='zh-CN')
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no")
+        title= '聊天室'
+        link(rel='stylesheet', href='/stylesheets/chat.css')
+        script(type='text/javascript', src='/javascripts/jquery/jquery.min.js')
+        script(type='text/javascript', src='/javascripts/socket.io.js')
+        script(type='text/javascript', src='/javascripts/chat/chat.js')
+    body
+        //登录界面
+        .login-wrap
+            .login-con
+                h3 用户登录
+                input(type="text" placeholder="请输入昵称" id="loginName")
+                button(class='login-btn') 登录
+
+        //*聊天界面，一开始隐藏，用户登录成功后再显示*/
+        .chat-wrap.hide
+            h1 多人聊天室
+            .chat-con.clearfix
+            .bottom
+                input(type="text" id="sendtxt")
+                button(class="sendBtn") 发送

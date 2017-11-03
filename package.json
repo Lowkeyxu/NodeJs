@@ -17,6 +17,7 @@
     "readable-stream":"2.2.6",
     "node-uuid":"1.4.8",
     "mysql": "2.15.0",
-    "silly-datetime" : "0.1.2"
+    "silly-datetime" : "0.1.2",
+    "socket.io": "2.0.4"
   }
 }
