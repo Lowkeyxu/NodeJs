@@ -15,6 +15,12 @@ html(lang='zh-CN')
             .login-con
                 h3 用户登录
                 input(type="text" placeholder="请输入昵称" id="loginName")
+                img(id='userPhoto' style='width:100px;height:100px;display:none')
+                form.form-horizontal(enctype='multipart/form-data' method='post' action='javascript:;' id = "frmUploadFile")
+                    a(href='javascript:void(0);' class='a-upload')
+                        input(type="file" name="files" onchange='uploadFile(this);')
+                        span 上传头像
+                    p
                 button(class='login-btn') 登录
 
         //*聊天界面，一开始隐藏，用户登录成功后再显示*/

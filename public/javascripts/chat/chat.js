@@ -3,9 +3,9 @@
  */
 $(function(){
     /*建立socket连接，使用websocket协议，端口号是服务器端监听端口号*/
-    var url = "ws://xuwc.free.ngrok.cc";
-    var socket = io(url);
-    //var socket = io('ws://localhost:8081');
+    //var url = "ws://xuwc.free.ngrok.cc";
+   // var socket = io(url);
+    var socket = io('ws://localhost:8081');
     /*定义用户名*/
     var uname = null;
     /*登录*/
@@ -97,4 +97,31 @@ function checkin(data){
     $('.chat-wrap').show('slow');
 }
 
+
+//上传图片
+function uploadFile(obj){
+    var formData = new FormData($("#frmUploadFile")[0]);
+    $.ajax({
+        url: '/chats/upload',
+        type: 'POST',
+        data: formData,
+        async: false,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(data){
+            if(200 === data.code) {
+                $("#userPhoto").show();
+                $("#frmUploadFile").hide();
+                $("#userPhoto").attr('src', data.msg.src);
+            } else {
+                alert("上传失败");
+            }
+            console.log('imgUploader upload success, data:', data);
+        },
+        error: function(){
+            alert("与服务器通信发生错误");
+        }
+    });
+}
 

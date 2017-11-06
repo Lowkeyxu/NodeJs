@@ -18,6 +18,8 @@
     "node-uuid":"1.4.8",
     "mysql": "2.15.0",
     "silly-datetime" : "0.1.2",
-    "socket.io": "2.0.4"
+    "socket.io": "2.0.4",
+    "connect-multiparty": "~2.1.0",
+    "express-session": "~1.15.6"
   }
 }
