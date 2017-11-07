@@ -3,9 +3,9 @@
  */
 $(function(){
     /*建立socket连接，使用websocket协议，端口号是服务器端监听端口号*/
-    //var url = "ws://xuwc.free.ngrok.cc";
-   // var socket = io(url);
-    var socket = io('ws://localhost:8081');
+    var url = "ws://xuwc.free.ngrok.cc";
+   var socket = io(url);
+    //var socket = io('ws://localhost:8081');
     /*定义用户名*/
     var uname = null;
     /*登录*/
@@ -35,6 +35,9 @@ $(function(){
 
     /*新人加入提示*/
     socket.on('add',function(data){
+        if(data.username != uname){
+            playSound();
+        }
         var html = '<p>系统消息:'+data.username+'已加入群聊</p>';
         $('.chat-con').append(html);
     });
@@ -48,6 +51,9 @@ $(function(){
 
     /*接收消息*/
     socket.on('receiveMessage',function(data){
+        if(data.username != uname){
+            playSound();
+        }
         showMessage(data);
     });
 
@@ -99,7 +105,7 @@ function checkin(data){
 
 
 //上传图片
-function uploadFile(obj){
+function uploadFile(){
     var formData = new FormData($("#frmUploadFile")[0]);
     $.ajax({
         url: '/chats/upload',
@@ -123,5 +129,42 @@ function uploadFile(obj){
             alert("与服务器通信发生错误");
         }
     });
+}
+
+//播放音频
+function playSound(){
+    var borswer = window.navigator.userAgent.toLowerCase();
+    if ( borswer.indexOf( "ie" ) >= 0 ){
+        //IE内核浏览器
+        var strEmbed = '<embed name="embedPlay" src="/music/4083.wav" autostart="true" hidden="true" loop="false"></embed>';
+        if ( $( "body" ).find( "embed" ).length <= 0 )
+            $( "body" ).append( strEmbed );
+        var embed = document.embedPlay;
+
+        //浏览器不支持 audion，则使用 embed 播放
+        embed.volume = 100;
+        //embed.play();这个不需要
+    } else{
+        //非IE内核浏览器
+        var strAudio = "<audio id='audioPlay' src='/music/4083.wav' hidden='true'>";
+        if ( $( "body" ).find( "audio" ).length <= 0 )
+            $( "body" ).append( strAudio );
+        var audio = document.getElementById( "audioPlay" );
+
+        //浏览器支持 audion
+        audio.play();
+        // 解决iOS禁止自动播放音频
+        // 微信自动播放音频
+        document.addEventListener("WeixinJSBridgeReady",function () {
+            audio.play();
+        }, false);
+        // 其他应用在click/touch时触发播放
+        document.addEventListener('click', function () {
+            audio.play()
+        });
+        document.addEventListener('touchstart', function () {
+            audio.play()
+        });
+    }
 }
 

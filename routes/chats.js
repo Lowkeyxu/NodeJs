@@ -4,6 +4,7 @@
 
 var express = require('express');
 var session = require('express-session');
+var sd = require('silly-datetime');
 var fs = require('fs');
 var path = require('path');
 var multipart = require('connect-multiparty');
@@ -54,7 +55,7 @@ io.on('connection', function (socket) {
                 username:data.username
             });
             /*登录成功*/
-            console.log("用户【"+data.username +"】进入房间");
+            console.log("用户【"+data.username +"】 "+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 进入房间 ");
             socket.emit('loginSuccess',data);
             /*向所有连接的客户端广播add事件*/
             io.sockets.emit('add',data)
@@ -66,7 +67,7 @@ io.on('connection', function (socket) {
     //退出登录
     socket.on('disconnect',function(){
         /*向所有连接的客户端广播leave事件*/
-        console.log("用户【"+username +"】离开房间");
+        console.log("用户【"+username +"】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 离开房间 ");
         io.sockets.emit('leave',username);
         users.map(function(val,index){
             if(val.username === username){
@@ -76,7 +77,7 @@ io.on('connection', function (socket) {
     });
     //发送消息
     socket.on('sendMessage',function(data){
-        console.log("【"+data.username + "】 发送消息："+data.message);
+        console.log("【"+data.username + "】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 发送消息："+data.message);
         io.sockets.emit('receiveMessage',data)
     })
 });
@@ -92,11 +93,12 @@ router.post("/upload",multipart(), function(req, res,next){
     var filename = req.files.files.originalFilename || path.basename(req.files.files.path);
     //后缀名
     var fileExt=(/[.]/.exec(filename)) ? /[^.]+$/.exec(filename.toLowerCase()) : '';
-    var dirpath = '../upload/image/'+ $common.uuidTools(req, res, next) + "."+fileExt;
+    var dirpath = '/image/'+ $common.uuidTools(req, res, next) + "."+fileExt;
     var uploadPath =  path.join(path.normalize(__dirname + '/..'),'upload/image', $common.uuidTools(req, res, next) + "."+fileExt);
     console.log("图片上传路径:"+uploadPath);
+    console.log("图片上传相对路径:"+dirpath);
     fs.createReadStream(req.files.files.path).pipe(fs.createWriteStream(uploadPath));
-    res.json({code: 200, msg: {src: __dirname}});
+    res.json({code: 200, msg: {src: dirpath}});
 });
 
 module.exports = router;
