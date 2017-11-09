@@ -15,15 +15,6 @@ var router = express.Router();
 //监听端口
 var io = require('socket.io').listen(8081);
 
-var app = express();
-app.use(session({
-    secret: 'xuwc', // 建议使用 128 个字符的随机字符串
-    cookie: { maxAge: 60 * 1000 },
-    saveUninitialized: false,  // 是否自动保存未初始化的会话，建议false
-    resave: false,  // 是否每次都重新保存会话，建议false
-}));
-
-
 /*定义用户数组*/
 var users = [];
 /**
@@ -54,6 +45,8 @@ io.on('connection', function (socket) {
             users.push({
                 username:data.username
             });
+
+            console.log('cookie', socket.request.headers.cookie);
             /*登录成功*/
             console.log("用户【"+data.username +"】 "+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 进入房间 ");
             socket.emit('loginSuccess',data);
@@ -90,11 +83,12 @@ router.get('/login', function(req, res, next) {
 
 //上传头像
 router.post("/upload",multipart(), function(req, res,next){
+    var uuid = $common.uuidTools(req, res, next);
     var filename = req.files.files.originalFilename || path.basename(req.files.files.path);
     //后缀名
     var fileExt=(/[.]/.exec(filename)) ? /[^.]+$/.exec(filename.toLowerCase()) : '';
-    var dirpath = '/image/'+ $common.uuidTools(req, res, next) + "."+fileExt;
-    var uploadPath =  path.join(path.normalize(__dirname + '/..'),'upload/image', $common.uuidTools(req, res, next) + "."+fileExt);
+    var dirpath = '/image/'+ uuid + "."+fileExt;
+    var uploadPath =  path.join(path.normalize(__dirname + '/..'),'upload/image', uuid + "."+fileExt);
     console.log("图片上传路径:"+uploadPath);
     console.log("图片上传相对路径:"+dirpath);
     fs.createReadStream(req.files.files.path).pipe(fs.createWriteStream(uploadPath));

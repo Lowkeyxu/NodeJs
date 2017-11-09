@@ -3,17 +3,18 @@
  */
 $(function(){
     /*建立socket连接，使用websocket协议，端口号是服务器端监听端口号*/
-    var url = "ws://xuwc.free.ngrok.cc";
-   var socket = io(url);
-    //var socket = io('ws://localhost:8081');
+   //  var url = "ws://xuwc.free.ngrok.cc";
+   // var socket = io(url);
+    var socket = io('ws://localhost:8081');
     /*定义用户名*/
     var uname = null;
     /*登录*/
     $('.login-btn').click(function(){
         uname = $.trim($('#loginName').val());
+        var imgurl = $("#userPhoto").attr("src");
         if(uname){
             /*向服务端发送登录事件*/
-            socket.emit('login',{username:uname})
+            socket.emit('login',{"username":uname,"imgurl":imgurl})
         }else{
             alert('请输入昵称')
         }
@@ -156,14 +157,15 @@ function playSound(){
         // 解决iOS禁止自动播放音频
         // 微信自动播放音频
         document.addEventListener("WeixinJSBridgeReady",function () {
-            audio.play();
+            //audio.play();
         }, false);
         // 其他应用在click/touch时触发播放
         document.addEventListener('click', function () {
-            audio.play()
+            //audio.play()
         });
+        //触摸触发事件
         document.addEventListener('touchstart', function () {
-            audio.play()
+            //audio.play()
         });
     }
 }
