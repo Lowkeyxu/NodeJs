@@ -6,9 +6,11 @@ html(lang='zh-CN')
         meta(name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no")
         title= '聊天室'
         link(rel='stylesheet', href='/stylesheets/chat.css')
+        link(rel='stylesheet', href='/stylesheets/showLoading.css')
         script(type='text/javascript', src='/javascripts/jquery/jquery.min.js')
         script(type='text/javascript', src='/javascripts/socket.io.js')
         script(type='text/javascript', src='/javascripts/chat/chat.js')
+        script(type='text/javascript', src='/javascripts/jquery.showLoading.js')
     body
         //登录界面
         .login-wrap
@@ -30,3 +32,4 @@ html(lang='zh-CN')
             .bottom
                 input(type="text" id="sendtxt")
                 button(class="sendBtn") 发送
+        #activity_pane(style='display:none')

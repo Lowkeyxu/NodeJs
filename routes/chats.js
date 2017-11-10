@@ -4,12 +4,15 @@
 
 var express = require('express');
 var session = require('express-session');
+var cookieParser = require('cookie-parser');
 var sd = require('silly-datetime');
 var fs = require('fs');
 var path = require('path');
 var multipart = require('connect-multiparty');
 var $common = require('../common/common');
 var router = express.Router();
+var app = express();
+
 
 //var service = require('http').createServer(express);
 //监听端口
@@ -17,6 +20,7 @@ var io = require('socket.io').listen(8081);
 
 /*定义用户数组*/
 var users = [];
+var map = new Map();
 /**
  *监听客户端连接
  *io是我们定义的服务端的socket
@@ -45,8 +49,10 @@ io.on('connection', function (socket) {
             users.push({
                 username:data.username
             });
-
-            console.log('cookie', socket.request.headers.cookie);
+            //console.log('cookie', socket.request.headers.cookie);
+            // 通过客户端的cookie字符串来获取其session数据
+            map.set(username,data.imgurl);
+            app.addUser(username,data.imgurl,socket.next);
             /*登录成功*/
             console.log("用户【"+data.username +"】 "+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 进入房间 ");
             socket.emit('loginSuccess',data);
@@ -71,6 +77,7 @@ io.on('connection', function (socket) {
     //发送消息
     socket.on('sendMessage',function(data){
         console.log("【"+data.username + "】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 发送消息："+data.message);
+        data.imgurl = map.get(data.username);
         io.sockets.emit('receiveMessage',data)
     })
 });
@@ -79,6 +86,11 @@ io.on('connection', function (socket) {
 router.get('/login', function(req, res, next) {
     res.render('chat');
 });
+
+
+app.addUser = function (username,imgurl,next) {
+    console.log("用户名："+username + " 头像地址：" +imgurl) ;
+};
 
 
 //上传头像

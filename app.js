@@ -21,24 +21,20 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'upload')));
+
+app.use(cookieParser());
+app.use(session({
+    secret : 'xuwc',
+    cookie :{maxAge : 60000},
+    saveUninitialized:true
+}));
 
 app.use('/', index);
 app.use('/users', users);
 app.use('/chats', chats);
-
-
-app.use(cookieParser('xuwc'));
-
-app.use(session({
-    secret: 'xuwc', // 建议使用 128 个字符的随机字符串
-    cookie: { maxAge: 60 * 1000 },
-    saveUninitialized: false,  // 是否自动保存未初始化的会话，建议false
-    resave: false,  // 是否每次都重新保存会话，建议false
-}));
-
 
 
 // catch 404 and forward to error handler

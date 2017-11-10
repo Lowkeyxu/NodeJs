@@ -91,7 +91,11 @@ $(function(){
             html='<div id='+timestamp+' class="chat-item item-left clearfix rela"><span class="abs uname">'+data.username+'</span><span class="img fl"></span><span class="fl message">'+data.message+'</span></div>'
         }
         $('.chat-con').append(html);
-        //显示到最后的地方
+        if(data.imgurl != "" && data.imgurl != null){
+            $("#"+timestamp).find("span.img").css("background-image",'url("' + data.imgurl + '")');
+        }
+
+            //显示到最后的地方
         document.getElementById(timestamp).scrollIntoView();
         // var div = document.getElementsByClassName('chat-con');
         // div.scrollTop = div.scrollHeight;
@@ -107,6 +111,7 @@ function checkin(data){
 
 //上传图片
 function uploadFile(){
+    $('#activity_pane').showLoading();
     var formData = new FormData($("#frmUploadFile")[0]);
     $.ajax({
         url: '/chats/upload',
@@ -121,13 +126,16 @@ function uploadFile(){
                 $("#userPhoto").show();
                 $("#frmUploadFile").hide();
                 $("#userPhoto").attr('src', data.msg.src);
+                $("#imgurl").val(data.msg.src);
             } else {
                 alert("上传失败");
             }
             console.log('imgUploader upload success, data:', data);
+            $('#activity_pane').hideLoading();
         },
         error: function(){
             alert("与服务器通信发生错误");
+            $('#activity_pane').hideLoading();
         }
     });
 }
