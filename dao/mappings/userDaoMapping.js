@@ -10,9 +10,13 @@ var user = {
 
     delete: ' DELETE FROM sys_user WHERE id=? ',
 
-    queryById: ' SELECT * FROM sys_user WHERE id=? ',
+    queryById: ' SELECT id,loginName,userName,sex FROM sys_user WHERE id=? ',
 
-    queryAll: " SELECT * FROM sys_user WHERE delFlag='0' "
+    queryAll: " SELECT * FROM sys_user WHERE delFlag='0' ",
+
+    queryUser: " SELECT * FROM sys_user WHERE delFlag='0' AND loginName=? AND password=? ",
+
+    saveRegister: " INSERT INTO sys_user(id,loginName,userName,sex,photoImage,password,addTime) VALUES(?,?,?,?,?,?,?)  "
 };
 
 module.exports = user;

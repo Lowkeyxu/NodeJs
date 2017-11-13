@@ -1,0 +1,71 @@
+//Created by xuwc on 2017/11/13.
+doctype html
+html(lang='zh-CN')
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no")
+        title= '注册'
+        link(rel='stylesheet', href='/bootstrap-3.3.7-dist/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/stylesheets/showLoading.css')
+        link(rel='stylesheet', href='/javascripts/jquery-validation/1.11.0/jquery.validate.min.css')
+        script(type='text/javascript', src='/javascripts/jquery/jquery.min.js')
+        script(type='text/javascript', src='/bootstrap-3.3.7-dist/js/bootstrap.min.js')
+        script(type='text/javascript', src='/javascripts/chat/chatregister.js')
+        script(type='text/javascript', src='/javascripts/jquery.showLoading.js')
+        script(type='text/javascript', src='/javascripts/jquery-validation/1.11.0/jquery.validate.min.js?version=20171113')
+    body(style='background: #dcd9da')
+        nav.collapse.navbar-collapse.navbar-inverse
+            .navbar-header
+                a.navbar-brand express-jade-bootstrap-mysql-demo
+            ul.nav.navbar-nav.navbar-right
+                li(style='margin-right: 20px')
+                    a(href='/login')
+                        span.glyphicon.glyphicon-log-in
+                        |  登录
+        .container
+            .row
+                .col-md-4.col-md-offset-4
+                    .panel.panel-default(style='margin-top: 40px')
+                        .panel-heading(style='background: #0d6aad')
+                            h3(align='center', style='color: #ffffff;')
+                                | 账号注册
+                        .panel-body(style='background: #e0e1ea')
+                                form#regForm
+                                    .form-group
+                                        .input-group
+                                            span.input-group-addon(style='width:80px')   账号  
+                                            input#loginName.form-control(type='text', name="loginName" placeholder='请输入账号')
+                                    .form-group
+                                        .input-group
+                                            span.input-group-addon(style='width:80px')   密码  
+                                            input#password.form-control(type='password', name="password" placeholder='请输入密码')
+                                    .form-group
+                                        .input-group
+                                            span.input-group-addon(style='width:80px')  确认密码
+                                            input#confirmpassword.form-control(type='password',name="confirmpassword" placeholder='请再次输入密码')
+                                    .form-group
+                                        .input-group
+                                            span.input-group-addon(style='width:80px') 用户名
+                                            input#userName.form-control(type='text', name="userName" placeholder='请输入用户名')
+                                    .form-group
+                                        .input-group
+                                            span.input-group-addon(style='width:80px') 性别
+                                            select#sex.form-control(style='width:196px' name="sex")
+                                                option(value='男') 男
+                                                option(value='女') 女
+                                .form-group
+                                    .input-group
+                                        span.input-group-addon(style='width:80px') 头像
+                                        input#photoImage(type='hidden')
+                                        img(id='userPhoto' style='width:100px;height:100px;display:none' onclick='uploadFile();')
+                                        form.form-horizontal(enctype='multipart/form-data' method='post' action='javascript:;' id = "frmUploadFile")
+                                            a(href='javascript:void(0);' class='a-upload')
+                                                input.form-control(type="file" name="files" onchange='uploadFile();' style='width:196px')
+                                .form-group
+                                    button#register.btn.btn-success.btn-block(type='button')
+                                        | 注册
+                            #popup.alert.alert-warning(style='display:none')
+                                a#close.close(href='#') ×
+                                div(align='center')
+                                    strong#popup-content(style='color: #b12e30;')
+                            #activity_pane(style='display:none')

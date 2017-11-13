@@ -4,12 +4,13 @@
 
 var express = require('express');
 var session = require('express-session');
-var cookieParser = require('cookie-parser');
 var sd = require('silly-datetime');
 var fs = require('fs');
 var path = require('path');
 var multipart = require('connect-multiparty');
 var $common = require('../common/common');
+//用户dao
+var userDao = require('../dao/userDao');
 var router = express.Router();
 var app = express();
 
@@ -36,31 +37,35 @@ io.on('connection', function (socket) {
     var username = null;
     /*监听登录*/
     socket.on('login',function(data){
-        for(var i=0;i<users.length;i++){
-            if(users[i].username === data.username){
-                isNewPerson = false;
-                break;
-            }else{
-                isNewPerson = true
-            }
-        }
-        if(isNewPerson){
-            username = data.username;
-            users.push({
-                username:data.username
+        var id = data.id;
+        if(id !== null && id !== undefined){
+            //查询用户信息
+            userDao.queryUserInfo(id,function(data){
+                var user = data[0];
+                for(var i=0;i<users.length;i++){
+                    if(users[i].username === user.userName){
+                        isNewPerson = false;
+                        break;
+                    }else{
+                        isNewPerson = true
+                    }
+                }
+                if(isNewPerson){
+                    username = user.userName;
+                    users.push({
+                        username:user.userName
+                    });
+                    map.set(username,user.photoImage);
+                    /*登录成功*/
+                    console.log("用户【"+user.userName +"】 "+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 进入房间 ");
+                    socket.emit('loginSuccess',user);
+                    /*向所有连接的客户端广播add事件*/
+                    io.sockets.emit('add',user)
+                }else{
+                    /*登录失败*/
+                    socket.emit('loginFail','')
+                }
             });
-            //console.log('cookie', socket.request.headers.cookie);
-            // 通过客户端的cookie字符串来获取其session数据
-            map.set(username,data.imgurl);
-            app.addUser(username,data.imgurl,socket.next);
-            /*登录成功*/
-            console.log("用户【"+data.username +"】 "+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 进入房间 ");
-            socket.emit('loginSuccess',data);
-            /*向所有连接的客户端广播add事件*/
-            io.sockets.emit('add',data)
-        }else{
-            /*登录失败*/
-            socket.emit('loginFail','')
         }
     });
     //退出登录
@@ -82,15 +87,54 @@ io.on('connection', function (socket) {
     })
 });
 
-//进入聊天室
+//进入登录
 router.get('/login', function(req, res, next) {
-    res.render('chat');
+    if(req.session.user){
+        res.render('chatroom');
+    }else{
+        res.render('chatlogin');
+    }
 });
 
+//进入登录
+router.get('/register', function(req, res, next) {
+    res.render('chatregister');
+});
 
-app.addUser = function (username,imgurl,next) {
-    console.log("用户名："+username + " 头像地址：" +imgurl) ;
-};
+//注册信息保存
+router.post("/saveRegister",function(req,res,next){
+    userDao.saveRegister(req, res,function(data){
+        if(data) {
+            $common.jsonWrite(res, {code:10000,msg: '注册成功!'});
+        }else{
+            $common.jsonWrite(res, {code:10001,msg: '注册失败!'});
+        }
+    });
+});
+
+//登录
+router.post("/toLogin",function(req,res,next){
+    //登录账号
+    var loginName = req.body.loginName;
+    //密码
+    var password = req.body.password;
+    if(loginName === "" || password === ""){
+        res.json({code: 10000, msg: "登录名或密码不能为空！"});
+    }else{
+        userDao.queryUser(req, res,function (data) {
+            if(data != null && data.length > 0){
+                req.session.user = data[0];
+                $common.jsonWrite(res, {code:10000,msg: '登录成功!',data:data[0]});
+            }else{
+                $common.jsonWrite(res, {code:10001,msg: '账号或密码不正确!'});
+            }
+        });
+    }
+});
+//首页
+router.get("/index",function(req,res,next){
+    res.render('chatroom');
+});
 
 
 //上传头像

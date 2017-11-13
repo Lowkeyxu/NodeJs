@@ -1,10 +1,10 @@
 /**
- * Created by xuwc on 2017/11/3.
+ * Created by xuwc on 2017/11/13.
  */
 $(function(){
     /*建立socket连接，使用websocket协议，端口号是服务器端监听端口号*/
-   //  var url = "ws://xuwc.free.ngrok.cc";
-   // var socket = io(url);
+    //  var url = "ws://xuwc.free.ngrok.cc";
+    // var socket = io(url);
     var socket = io('ws://localhost:8081');
     /*定义用户名*/
     var uname = null;
@@ -16,9 +16,11 @@ $(function(){
             /*向服务端发送登录事件*/
             socket.emit('login',{"username":uname,"imgurl":imgurl})
         }else{
-            alert('请输入昵称')
+            alert('请输入昵称');
         }
     });
+
+    $("#login").click(login);
 
     /*登录成功*/
     socket.on('loginSuccess',function(data){
@@ -95,12 +97,68 @@ $(function(){
             $("#"+timestamp).find("span.img").css("background-image",'url("' + data.imgurl + '")');
         }
 
-            //显示到最后的地方
+        //显示到最后的地方
         document.getElementById(timestamp).scrollIntoView();
         // var div = document.getElementsByClassName('chat-con');
         // div.scrollTop = div.scrollHeight;
     }
+
+    $(".close").click(function(){
+        $(this).parent().hide();
+    });
+
 });
+
+document.onkeydown = keyDownSearch;
+
+function keyDownSearch(e) {
+    // 兼容FF和IE和Opera
+    var theEvent = e || window.event;
+    var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+    if (code == 13) {
+        login();// 具体处理函数
+        return false;
+    }
+    return true;
+}
+
+//登录
+function login() {
+    //清空错误消息
+    $("#popup-content").html("");
+    //登录名
+    var loginName = $("#loginName").val();
+    //密码
+    var password = $("#password").val();
+    if(loginName == ""){
+        $("#popup").show();
+        $("#popup-content").html('请输入账号');
+        return;
+    }
+    if(password == ""){
+        $("#popup").show();
+        $("#popup-content").html('请输入密码');
+        return;
+    }
+    $.ajax({
+        url: '/chats/toLogin',
+        type: 'POST',
+        data: {"loginName":loginName,"password":password},
+        async: false,
+        dataType: "json",
+        success: function(data){
+            if(10000 === data.code) {
+                window.location.href= "/chats/index";
+            } else {
+                $("#popup").show();
+                $("#popup-content").html(data.msg);
+            }
+        },
+        error: function(){
+            alert("与服务器通信发生错误");
+        }
+    });
+}
 
 /*隐藏登录界面 显示聊天界面*/
 function checkin(data){
@@ -130,7 +188,6 @@ function uploadFile(){
             } else {
                 alert("上传失败");
             }
-            console.log('imgUploader upload success, data:', data);
             $('#activity_pane').hideLoading();
         },
         error: function(){
@@ -177,4 +234,5 @@ function playSound(){
         });
     }
 }
+
 

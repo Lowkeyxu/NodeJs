@@ -67,7 +67,7 @@ module.exports = {
                     next(result);
                     //$common.jsonWrite(res, result);
                 } else {
-                    $common.jsonWrite(res, "{code:'10001',msg: '更新失败'}");
+                    $common.jsonWrite(res, {code:'10001',msg: '更新失败'});
                 }
                 connection.release();
             });
@@ -93,7 +93,40 @@ module.exports = {
                 connection.release();
             });
         });
-    }
+    },
+    queryUser:function (req,res,next) {
+        var param = req.body;
+        var params = [param.loginName,param.password];
+        pool.getConnection(function(err, connection) {
+            connection.query($sql.queryUser,params,function(err, result) {
+                next(result);
+                connection.release();
+            });
+        });
+    },
+    saveRegister:function(req,res,next){
+        var param = req.body;
+        var imgurl = "/images/user/user.jpg";
+        if(param.photoImage !== "" && param.photoImage !== undefined){
+            imgurl = param.photoImage
+        }
+        var id = $common.uuidTools(req, res, next);
+        var params = [id,param.loginName,param.userName,param.sex,imgurl,param.password,$common.getNowTime()];
+        pool.getConnection(function(err, connection) {
+            connection.query($sql.saveRegister,params,function(err, result) {
+                next(result);
+                connection.release();
+            });
+        });
+    },
+    queryUserInfo: function (id,next) {
+        pool.getConnection(function(err, connection) {
+            connection.query($sql.queryById, [id], function(err, result) {
+                next(result);
+                connection.release();
 
+            });
+        });
+    }
 };
 

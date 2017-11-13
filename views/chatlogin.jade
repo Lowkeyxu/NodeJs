@@ -1,0 +1,43 @@
+//Created by xuwc on 2017/11/3.
+doctype html
+html(lang='zh-CN')
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no")
+        title= '登录'
+        link(rel='stylesheet', href='/stylesheets/chat.css')
+        link(rel='stylesheet', href='/stylesheets/showLoading.css')
+        link(rel='stylesheet', href='/bootstrap-3.3.7-dist/css/bootstrap.min.css')
+        script(type='text/javascript', src='/javascripts/jquery/jquery.min.js')
+        script(type='text/javascript', src='/javascripts/socket.io.js')
+        script(type='text/javascript', src='/javascripts/chat/chatlogin.js')
+        script(type='text/javascript', src='/javascripts/jquery.showLoading.js')
+        script(type='text/javascript', src='/bootstrap-3.3.7-dist/js/bootstrap.min.js')
+    body(style='background: #dcd9da')
+        .container
+            .row
+                .col-md-4.col-md-offset-4
+                    .panel.panel-default(style='margin-top: 100px')
+                        .panel-heading(style='background: #0d6aad')
+                            h4(align='center', style='color: #ffffff;')
+                                | 用户登录
+                        .panel-body(style='background: #e0e1ea')
+                            .form-group
+                                .input-group
+                                    span.input-group-addon 账号
+                                    input#loginName.form-control(type='text', placeholder='请输入账号')
+                            .form-group
+                                .input-group
+                                    span.input-group-addon 密码
+                                    input#password.form-control(type='password',placeholder='请输入密码')
+                            .form-group
+                                .col-lg-offset-7
+                                    | 没有账号？
+                                    a(href='/chats/register') 注册
+                            .form-group
+                                button#login.btn.btn-success.btn-block(type='button')
+                                    | 登录
+                            #popup.alert.alert-warning(style='display:none')
+                                a#close.close(href='#') ×
+                                div(align='center')
+                                    strong#popup-content(style='color: #b12e30;')
