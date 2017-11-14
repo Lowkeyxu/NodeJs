@@ -1,34 +1,27 @@
 /**
  * Created by xuwc on 2017/11/13.
  */
+/*建立socket连接，使用websocket协议，端口号是服务器端监听端口号*/
+//  var url = "ws://xuwc.free.ngrok.cc";
+// var socket = io(url);
+var socket = io('ws://localhost:8081');
+var index=0;
+/*定义用户名*/
+var uname = null;
 $(function(){
-    /*建立socket连接，使用websocket协议，端口号是服务器端监听端口号*/
-    //  var url = "ws://xuwc.free.ngrok.cc";
-    // var socket = io(url);
-    var socket = io('ws://localhost:8081');
-    /*定义用户名*/
-    var uname = null;
-    /*登录*/
-    $('.login-btn').click(function(){
-        uname = $.trim($('#loginName').val());
-        var imgurl = $("#userPhoto").attr("src");
-        if(uname){
-            /*向服务端发送登录事件*/
-            socket.emit('login',{"username":uname,"imgurl":imgurl})
-        }else{
-            alert('请输入昵称');
-        }
-    });
-
-    $("#login").click(login);
+    if(index == 0){
+        console.log()
+        var id = $("#id").val();
+        /*向服务端发送登录事件*/
+        socket.emit('login',{"id":id});
+        index++;
+    }
 
     /*登录成功*/
     socket.on('loginSuccess',function(data){
-        if(data.username === uname){
-            checkin(data)
-        }else{
-            alert('用户名不匹配，请重试')
-        }
+        //存入用户名作为匹配
+         $("#userName").val(data.userName);
+         uname = data.userName;
     });
 
     /*登录失败*/
@@ -38,10 +31,10 @@ $(function(){
 
     /*新人加入提示*/
     socket.on('add',function(data){
-        if(data.username != uname){
+        if(data.userName != uname){
             playSound();
         }
-        var html = '<p>系统消息:'+data.username+'已加入群聊</p>';
+        var html = '<p>系统消息:'+data.userName+'已加入群聊</p>';
         $('.chat-con').append(html);
     });
     /*退出群聊提示*/
@@ -54,7 +47,7 @@ $(function(){
 
     /*接收消息*/
     socket.on('receiveMessage',function(data){
-        if(data.username != uname){
+        if(data.userName != uname){
             playSound();
         }
         showMessage(data);
@@ -79,7 +72,7 @@ $(function(){
         //清空输入框
         $('#sendtxt').val('');
         if(txt){
-            socket.emit('sendMessage',{username:uname,message:txt});
+            socket.emit('sendMessage',{"userName":uname,"message":txt});
         }
     }
 
@@ -87,10 +80,10 @@ $(function(){
     function showMessage(data){
         var timestamp = new Date().getTime();
         var html;
-        if(data.username === uname){
+        if(data.userName === uname){
             html = '<div id='+timestamp+' class="chat-item item-right clearfix"><span class="img fr"></span><span class="message fr">'+data.message+'</span></div>'
         }else{
-            html='<div id='+timestamp+' class="chat-item item-left clearfix rela"><span class="abs uname">'+data.username+'</span><span class="img fl"></span><span class="fl message">'+data.message+'</span></div>'
+            html='<div id='+timestamp+' class="chat-item item-left clearfix rela"><span class="abs uname">'+data.userName+'</span><span class="img fl"></span><span class="fl message">'+data.message+'</span></div>'
         }
         $('.chat-con').append(html);
         if(data.imgurl != "" && data.imgurl != null){
@@ -108,63 +101,6 @@ $(function(){
     });
 
 });
-
-document.onkeydown = keyDownSearch;
-
-function keyDownSearch(e) {
-    // 兼容FF和IE和Opera
-    var theEvent = e || window.event;
-    var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
-    if (code == 13) {
-        login();// 具体处理函数
-        return false;
-    }
-    return true;
-}
-
-//登录
-function login() {
-    //清空错误消息
-    $("#popup-content").html("");
-    //登录名
-    var loginName = $("#loginName").val();
-    //密码
-    var password = $("#password").val();
-    if(loginName == ""){
-        $("#popup").show();
-        $("#popup-content").html('请输入账号');
-        return;
-    }
-    if(password == ""){
-        $("#popup").show();
-        $("#popup-content").html('请输入密码');
-        return;
-    }
-    $.ajax({
-        url: '/chats/toLogin',
-        type: 'POST',
-        data: {"loginName":loginName,"password":password},
-        async: false,
-        dataType: "json",
-        success: function(data){
-            if(10000 === data.code) {
-                window.location.href= "/chats/index";
-            } else {
-                $("#popup").show();
-                $("#popup-content").html(data.msg);
-            }
-        },
-        error: function(){
-            alert("与服务器通信发生错误");
-        }
-    });
-}
-
-/*隐藏登录界面 显示聊天界面*/
-function checkin(data){
-    $('.login-wrap').hide('slow');
-    $('.chat-wrap').show('slow');
-}
 
 
 //上传图片

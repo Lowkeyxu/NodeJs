@@ -9,23 +9,11 @@ html(lang='zh-CN')
         link(rel='stylesheet', href='/stylesheets/showLoading.css')
         script(type='text/javascript', src='/javascripts/jquery/jquery.min.js')
         script(type='text/javascript', src='/javascripts/socket.io.js')
-        script(type='text/javascript', src='/javascripts/chat/chatlogin.js')
+        script(type='text/javascript', src='/javascripts/chat/chatroom.js')
         script(type='text/javascript', src='/javascripts/jquery.showLoading.js')
     body
-         //登录界面
-        //.login-wrap
-        //    .login-con
-        //        h3 用户登录
-        //        input(type="text" placeholder="请输入昵称" id="loginName")
-        //        img(id='userPhoto' style='width:100px;height:100px;display:none' onclick='uploadFile();')
-        //        form.form-horizontal(enctype='multipart/form-data' method='post' action='javascript:;' id = "frmUploadFile")
-        //            a(href='javascript:void(0);' class='a-upload')
-        //                input(type="file" name="files" onchange='uploadFile();')
-        //                span 上传头像
-        //            p
-        //        button(class='login-btn' style='margin-top:20px') 登录
-
-        //*聊天界面，一开始隐藏，用户登录成功后再显示*/
+        input(type="hidden" id="id" value='#{id}')
+        input(type="hidden" id="userName")
         .chat-wrap
             h1 多人聊天室
             .chat-con.clearfix

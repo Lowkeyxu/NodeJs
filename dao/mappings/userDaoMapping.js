@@ -10,7 +10,7 @@ var user = {
 
     delete: ' DELETE FROM sys_user WHERE id=? ',
 
-    queryById: ' SELECT id,loginName,userName,sex FROM sys_user WHERE id=? ',
+    queryById: ' SELECT id,loginName,userName,sex,photoImage FROM sys_user WHERE id=? ',
 
     queryAll: " SELECT * FROM sys_user WHERE delFlag='0' ",
 

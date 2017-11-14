@@ -43,7 +43,7 @@ io.on('connection', function (socket) {
             userDao.queryUserInfo(id,function(data){
                 var user = data[0];
                 for(var i=0;i<users.length;i++){
-                    if(users[i].username === user.userName){
+                    if(users[i].userName === user.userName){
                         isNewPerson = false;
                         break;
                     }else{
@@ -53,7 +53,7 @@ io.on('connection', function (socket) {
                 if(isNewPerson){
                     username = user.userName;
                     users.push({
-                        username:user.userName
+                        userName:user.userName
                     });
                     map.set(username,user.photoImage);
                     /*登录成功*/
@@ -74,15 +74,15 @@ io.on('connection', function (socket) {
         console.log("用户【"+username +"】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 离开房间 ");
         io.sockets.emit('leave',username);
         users.map(function(val,index){
-            if(val.username === username){
+            if(val.userName === username){
                 users.splice(index,1);
             }
         });
     });
     //发送消息
     socket.on('sendMessage',function(data){
-        console.log("【"+data.username + "】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 发送消息："+data.message);
-        data.imgurl = map.get(data.username);
+        data.imgurl = map.get(data.userName);
+        console.log("【"+data.userName + "】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 发送消息："+data.message);
         io.sockets.emit('receiveMessage',data)
     })
 });
@@ -133,7 +133,9 @@ router.post("/toLogin",function(req,res,next){
 });
 //首页
 router.get("/index",function(req,res,next){
-    res.render('chatroom');
+    //用户id
+    var id = req.query.id;
+    res.render('chatroom',{id: id});
 });
 
 
