@@ -1,0 +1,24 @@
+//Created by xuwc on 2017/11/22.
+doctype html
+html(lang='zh-CN')
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no")
+        link(rel='stylesheet', href='/stylesheets/chat.css')
+        link(rel='stylesheet', href='/stylesheets/showLoading.css')
+        script(type='text/javascript', src='/javascripts/jquery/jquery.min.js')
+        script(type='text/javascript', src='/javascripts/socket.io.js')
+        script(type='text/javascript', src='/javascripts/chat/privatechat.js')
+        script(type='text/javascript', src='/javascripts/jquery.showLoading.js')
+    body
+        input(type="hidden" id="from" value='#{fromuser.userName}')
+        input(type="hidden" id="to" value='#{touser.userName}')
+        input(type="hidden" id="fromId" value='#{fromuser.id}')
+        input(type="hidden" id="toId" value='#{touser.id}')
+        .chat-wrap
+            h1 正在与#{touser.userName}私聊
+            .chat-con.clearfix
+            .bottom
+                input(type="text" id="sendtxt")
+                button(class="sendBtn") 发送
+        #activity_pane(style='display:none')

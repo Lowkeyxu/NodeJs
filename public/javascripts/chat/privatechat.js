@@ -1,33 +1,10 @@
 /**
- * Created by xuwc on 2017/11/13.
+ * Created by xuwc on 2017/11/22.
  */
 /*建立socket连接，使用websocket协议，端口号是服务器端监听端口号*/
-//  var url = "ws://xuwc.free.ngrok.cc";
-// var socket = io(url);
 var socket = io('ws://localhost:8081');
-var index=0;
-/*定义用户名*/
-var uname = null;
+var uname;
 $(function(){
-    if(index == 0){
-        console.log()
-        var id = $("#id").val();
-        /*向服务端发送登录事件*/
-        socket.emit('login',{"id":id});
-        index++;
-    }
-
-    /*登录成功*/
-    socket.on('loginSuccess',function(data){
-        //存入用户名作为匹配
-         $("#userName").val(data.userName);
-         uname = data.userName;
-    });
-
-    /*登录失败*/
-    socket.on('loginFail',function(){
-        alert('昵称重复')
-    });
 
     /*新人加入提示*/
     socket.on('add',function(data){
@@ -53,6 +30,7 @@ $(function(){
         showMessage(data);
     });
 
+
     /*接收私聊消息*/
     socket.on('sayToMessage',function(data){
         if(data.from != uname){
@@ -60,7 +38,6 @@ $(function(){
         }
         showMessage(data);
     });
-
 
     /*发送消息*/
     $('.sendBtn').click(function(){
@@ -77,27 +54,26 @@ $(function(){
     function sendMessage(){
         //消息内容
         var txt = $('#sendtxt').val();
+        var from = $('#from').val();
+        var to = $('#to').val();
+        var fromId = $('#fromId').val();
+        var toId = $('#toId').val();
         //清空输入框
         $('#sendtxt').val('');
-        //用户id
-        var id =$("#id").val();
         if(txt){
-            socket.emit('sendMessage',{"userName":uname,"userId":id,"message":txt});
+            uname = from;
+            socket.emit('sayTo',{"from": from,"to": to,"fromId":fromId,"toId":toId,"message": txt});
         }
     }
 
     /*显示消息*/
     function showMessage(data){
-        var ms = "";
-        if(data.to){
-            ms = "(来自私聊信息)";
-        }
         var timestamp = new Date().getTime();
         var html;
         if(data.userName === uname){
-            html = '<div id='+timestamp+' class="chat-item item-right clearfix"><span class="img fr" uid='+data.userId+'></span><span class="message fr">'+data.message+'</span></div>'
+            html = '<div id='+timestamp+' class="chat-item item-right clearfix"><span class="img fr"></span><span class="message fr">'+data.message+'</span></div>'
         }else{
-            html='<div id='+timestamp+' class="chat-item item-left clearfix rela"><span class="abs uname">'+data.userName+ms+'</span><span class="img fl" uid='+data.userId+'></span><span class="fl message">'+data.message+'</span></div>'
+            html='<div id='+timestamp+' class="chat-item item-left clearfix rela"><span class="abs uname">'+data.userName+'</span><span class="img fl"></span><span class="fl message">'+data.message+'</span></div>'
         }
         $('.chat-con').append(html);
         if(data.imgurl != "" && data.imgurl != null){
@@ -106,53 +82,9 @@ $(function(){
 
         //显示到最后的地方
         document.getElementById(timestamp).scrollIntoView();
-        // var div = document.getElementsByClassName('chat-con');
-        // div.scrollTop = div.scrollHeight;
     }
 
-    //点击头像私聊
-    $('.chat-con').on('click','.img', function() {
-        //用户id
-        var userId = $(this).attr("uid");
-        //当前登录用户id
-        var id = $("#id").val();
-        if(userId != id){
-            window.location.href= "/chats/privateChat?fromId="+id+"&toId="+userId;
-        }
-    });
-
 });
-
-
-//上传图片
-function uploadFile(){
-    $('#activity_pane').showLoading();
-    var formData = new FormData($("#frmUploadFile")[0]);
-    $.ajax({
-        url: '/chats/upload',
-        type: 'POST',
-        data: formData,
-        async: false,
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function(data){
-            if(200 === data.code) {
-                $("#userPhoto").show();
-                $("#frmUploadFile").hide();
-                $("#userPhoto").attr('src', data.msg.src);
-                $("#imgurl").val(data.msg.src);
-            } else {
-                alert("上传失败");
-            }
-            $('#activity_pane').hideLoading();
-        },
-        error: function(){
-            alert("与服务器通信发生错误");
-            $('#activity_pane').hideLoading();
-        }
-    });
-}
 
 //播放音频
 function playSound(){

@@ -68,3 +68,62 @@ h1{position: fixed; z-index:20; width: 100%; height:50px; line-height:50px; font
     border-color: #ccc;
     text-decoration: none
 }
+
+
+/* 2017-11-20 */
+body{
+    padding:0px;
+    margin:0px;
+    text-align:center;
+    font-family:'微软雅黑',
+    TrebuchetMS,Verdana,Helvetica,Arial,sans-serif;
+    background-color: #eee;
+}
+#sideToggle{
+    display:none;
+}
+#sideToggle:checked + aside{
+    left:0;/** 选中的时候aside出现 */
+}
+#sideToggle:checked ~ #wrap{
+    padding-left:120px;
+}
+aside{
+    position:absolute;
+    top:0;/** 绝对位置可以脱离标准流，top和bot才管用 */
+    bottom:0;
+    left:-110px;/* 通过向左偏移，实现隐藏 */
+    width:110px;
+    background:#005e99;
+    transition:0.2s ease-out;
+    -webkit-transition:0.2s ease-out;
+    z-index:100;
+}
+#wrap{
+    margin-left:0px;
+    padding:0px 0px 0px 0px;
+    transition:0.25s ease-out;
+    -webkit-transition:0.25s ease-out;
+}
+#wrap > label{
+    display:inline-block;
+}
+#wrap > label{
+    float:left;
+    background:#005e99;
+    border-radius:50%;
+    color: #FFF;
+    cursor: pointer;
+    display: block;
+    font-family: Courier New;
+    font-size: 25px;
+    font-weight: bold;
+    width: 30px;
+    height: 30px;
+    line-height: 35px;
+    text-align: center;
+    text-shadow: 0 -4px;
+}
+#wrap > label:hover{
+    background:#8f0;
+}

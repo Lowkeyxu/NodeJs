@@ -7,6 +7,8 @@ var session = require('express-session');
 var sd = require('silly-datetime');
 var fs = require('fs');
 var path = require('path');
+var async = require('async');
+var _ = require('underscore');
 var multipart = require('connect-multiparty');
 var $common = require('../common/common');
 //用户dao
@@ -22,6 +24,7 @@ var io = require('socket.io').listen(8081);
 /*定义用户数组*/
 var users = [];
 var map = new Map();
+var hashName = {};
 /**
  *监听客户端连接
  *io是我们定义的服务端的socket
@@ -58,6 +61,7 @@ io.on('connection', function (socket) {
                     map.set(username,user.photoImage);
                     /*登录成功*/
                     console.log("用户【"+user.userName +"】 "+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 进入房间 ");
+                    hashName[username] = socket.id;
                     socket.emit('loginSuccess',user);
                     /*向所有连接的客户端广播add事件*/
                     io.sockets.emit('add',user)
@@ -84,8 +88,29 @@ io.on('connection', function (socket) {
         data.imgurl = map.get(data.userName);
         console.log("【"+data.userName + "】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 发送消息："+data.message);
         io.sockets.emit('receiveMessage',data)
-    })
+    });
+
+    //私聊
+    socket.on('sayTo',function(data){
+        console.log("【"+data.from + "】==>【"+data.to +"】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 消息："+data.message);
+        var tosocketId;
+        if (tosocketId = hashName[data.to]) {
+            data.imgurl = map.get(data.from);
+            data.userName = data.from;
+            data.userId = data.fromId;
+            privateSocket(tosocketId).emit('sayToMessage', data);
+        }
+        //显示自己发送
+        socket.emit('sayToMessage', data);
+    });
+
 });
+
+
+//提供私有socket
+function privateSocket(toId) {
+    return( _.findWhere(io.sockets.sockets, {id: toId}));
+}
 
 //进入登录
 router.get('/login', function(req, res, next) {
@@ -136,6 +161,32 @@ router.get("/index",function(req,res,next){
     //用户id
     var id = req.query.id;
     res.render('chatroom',{id: id});
+});
+
+/**
+ * 打开私聊页面
+ */
+router.get("/privateChat",function(req,res,next){
+    //发送人
+    var fromId =  req.query.fromId;
+    //接收人
+    var toId =  req.query.toId;
+    async.series({
+        from:function(cb) {
+            userDao.queryUserInfo(fromId,function (data) {
+                cb(null,data[0]);
+            });
+        },
+        to:function(cb) {
+            userDao.queryUserInfo(toId,function (data) {
+                cb(null,data[0]);
+            });
+        }
+    }, function(err, values) {
+        var fromuser = values.from;
+        var touser = values.to;
+        res.render('privateChat',{fromuser: fromuser ,touser: touser});
+    });
 });
 
 

@@ -21,6 +21,8 @@
     "socket.io": "2.0.4",
     "connect-multiparty": "~2.1.0",
     "express-session": "~1.15.6",
-    "connect": "~3.6.5"
+    "connect": "~3.6.5",
+    "async": "~2.6.0",
+    "underscore": "~1.8.3"
   }
 }
