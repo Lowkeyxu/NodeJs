@@ -25,6 +25,7 @@ var io = require('socket.io').listen(8081);
 var users = [];
 var map = new Map();
 var hashName = {};
+var onLineNum = 0;
 /**
  *监听客户端连接
  *io是我们定义的服务端的socket
@@ -62,6 +63,8 @@ io.on('connection', function (socket) {
                     /*登录成功*/
                     console.log("用户【"+user.userName +"】 "+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 进入房间 ");
                     hashName[username] = socket.id;
+                    onLineNum = onLineNum + 1;
+                    onLine();
                     socket.emit('loginSuccess',user);
                     /*向所有连接的客户端广播add事件*/
                     io.sockets.emit('add',user)
@@ -77,6 +80,10 @@ io.on('connection', function (socket) {
         /*向所有连接的客户端广播leave事件*/
         console.log("用户【"+username +"】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 离开房间 ");
         io.sockets.emit('leave',username);
+        if(username !== null){
+            onLineNum = onLineNum - 1;
+            onLine();
+        }
         users.map(function(val,index){
             if(val.userName === username){
                 users.splice(index,1);
@@ -86,22 +93,33 @@ io.on('connection', function (socket) {
     //发送消息
     socket.on('sendMessage',function(data){
         data.imgurl = map.get(data.userName);
+        data.dateTime = sd.format(new Date(), 'MM-DD HH:mm:ss');
         console.log("【"+data.userName + "】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 发送消息："+data.message);
         io.sockets.emit('receiveMessage',data)
     });
 
     //私聊
     socket.on('sayTo',function(data){
+        //将进入私聊用户的socketid 重新赋值
+        hashName[data.from] = socket.id;
         console.log("【"+data.from + "】==>【"+data.to +"】"+sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')+" 消息："+data.message);
         var tosocketId;
         if (tosocketId = hashName[data.to]) {
             data.imgurl = map.get(data.from);
             data.userName = data.from;
             data.userId = data.fromId;
-            privateSocket(tosocketId).emit('sayToMessage', data);
+            data.dateTime = sd.format(new Date(), 'MM-DD HH:mm:ss');
+            var private_Socket = privateSocket(tosocketId);
+            if(private_Socket !== undefined){
+                private_Socket.emit('sayToMessage', data);
+                //显示自己发送
+                socket.emit('sayToMessage', data);
+            }else{
+                io.sockets.emit('offline',data.to);
+            }
+        }else{
+            io.sockets.emit('offline',data.to);
         }
-        //显示自己发送
-        socket.emit('sayToMessage', data);
     });
 
 });
@@ -110,6 +128,10 @@ io.on('connection', function (socket) {
 //提供私有socket
 function privateSocket(toId) {
     return( _.findWhere(io.sockets.sockets, {id: toId}));
+}
+//在线人数
+function onLine(){
+    io.sockets.emit('onLineNum',onLineNum);
 }
 
 //进入登录

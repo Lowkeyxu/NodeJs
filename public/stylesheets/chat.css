@@ -127,3 +127,8 @@ aside{
 #wrap > label:hover{
     background:#8f0;
 }
+
+#h1title{
+    font-size: x-small;
+    color: aqua;
+}

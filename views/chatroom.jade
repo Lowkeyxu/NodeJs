@@ -9,13 +9,16 @@ html(lang='zh-CN')
         link(rel='stylesheet', href='/stylesheets/showLoading.css')
         script(type='text/javascript', src='/javascripts/jquery/jquery.min.js')
         script(type='text/javascript', src='/javascripts/socket.io.js')
+        script(type='text/javascript', src='/javascripts/chat/common.js')
         script(type='text/javascript', src='/javascripts/chat/chatroom.js')
         script(type='text/javascript', src='/javascripts/jquery.showLoading.js')
     body
         input(type="hidden" id="id" value='#{id}')
         input(type="hidden" id="userName")
         .chat-wrap
-            h1 多人聊天室
+            h1
+                | 多人聊天室
+                | <span id='h1title'></span>
             .chat-con.clearfix
             .bottom
                 input(type="text" id="sendtxt")
